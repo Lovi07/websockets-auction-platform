@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const WebSocket = require("ws");
 const auctionItemsFile = require("./auctionItems");
 
 const app = express();
@@ -9,6 +11,23 @@ const bidHistory = [];
 
 app.use(express.json());
 app.use(cors());
+
+// Create a HTTP Server
+const server = http.createServer(app);
+
+// Create a WebSocket Server
+const wss = new WebSocket.Server({ server });
+
+// WebSocket connection handler
+wss.on("connection", (ws) => {
+  console.log("Client connected");
+
+  ws.send(JSON.stringify({ message: "Hello from WS!" }));
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
+});
 
 app.get("/", (req, res) => {
   res.status(200).send("MLH GHW API Week!");
@@ -66,7 +85,8 @@ app.post("/api/bids", (req, res) => {
   console.log(bidHistory);
 });
 
-
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server UP & RUNNING on Port ${PORT}`);
+  console.log(`REST API: http://localhost:${PORT}/api/items`);
+  console.log(`WebSocket: ws://localhost:${PORT}`);
 });
