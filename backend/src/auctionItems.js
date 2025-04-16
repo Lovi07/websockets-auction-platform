@@ -18,6 +18,14 @@ const auctionItems = [
     currentBid: 150,
     bids: [],
   },
+  {
+    id: 3,
+    name: "Raspberry Pi",
+    description: "Original RPi 1.0",
+    startingBid: 50,
+    currentBid: 50,
+    bids: [],
+  },
 ];
 
 module.exports = { auctionItems };

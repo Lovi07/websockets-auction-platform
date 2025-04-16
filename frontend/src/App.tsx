@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { type AuctionItem } from "./types/auction";
 import AuctionItemList from "./components/AuctionItemList";
+import { fetchAllItems } from "./services/api";
 
 const AppContainer = styled.div`
   max-width: 1200px;
@@ -27,6 +30,14 @@ const MainContent = styled.div`
   }
 `;
 
+const ErrorContent = styled.div`
+  padding: 10px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border-radius: 5px;
+  margin-bottom: 20px;
+`;
+
 const Footer = styled.footer`
   text-align: center;
   margin-top: 20px;
@@ -36,34 +47,57 @@ const Footer = styled.footer`
 `;
 
 function App() {
+  const [items, setItems] = useState<AuctionItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<AuctionItem | null>(null);
+  const [isLoadingItems, setIsLoadingItems] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadItems = async () => {
+      try {
+        setIsLoadingItems(true);
+        const data = await fetchAllItems();
+        setItems(data);
+        setIsLoadingItems(false);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+        setError("Failed to load auction items. Please try again later");
+        setIsLoadingItems(false);
+      }
+    };
+
+    loadItems();
+  }, []);
+
+  // useEffect(() => {
+  //   if (selectedItem) {
+  //     const updatedSelectedItem = items.find(
+  //       (item) => item.id === selectedItem.id
+  //     );
+  //     if (updatedSelectedItem) {
+  //       setSelectedItem(updatedSelectedItem);
+  //     }
+  //   }
+  // }, [items, selectedItem]);
+
+  const handleSelectItem = (item: AuctionItem) => {
+    setSelectedItem(item);
+  };
+
   return (
     <AppContainer>
       <Header>
         <h1>Live Auction Platform</h1>
       </Header>
+
+      {error && <ErrorContent>{error}</ErrorContent>}
+
       <MainContent>
         <AuctionItemList
-          items={[
-            {
-              id: 1,
-              name: "Vintage Watch",
-              description: "Classic timepiece from 1950s",
-              startingBid: 100,
-              currentBid: 100,
-              bids: [],
-            },
-            {
-              id: 2,
-              name: "Art Painting",
-              description: "Original Artwork in Skribble.io",
-              startingBid: 150,
-              currentBid: 150,
-              bids: [],
-            },
-          ]}
-          isLoading={false}
-          selectedItemId={1}
-          onSelectItem={() => console.log("Item selected")}
+          items={items}
+          isLoading={isLoadingItems}
+          selectedItemId={selectedItem?.id}
+          onSelectItem={handleSelectItem}
         />
       </MainContent>
       <Footer>
