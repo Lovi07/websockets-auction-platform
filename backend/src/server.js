@@ -203,6 +203,6 @@ function broadcastBidUpdate(item, bid) {
 // Start the server - It listens to HTTP and WebSocket messages on the same port
 server.listen(PORT, () => {
   console.log(`Server UP & RUNNING on Port ${PORT}`);
-  console.log(`REST API: http://localhost:${PORT}/api/items`);
+  console.log(`REST API: http://localhost:${PORT}`);
   console.log(`WebSocket: ws://localhost:${PORT}`);
 });
